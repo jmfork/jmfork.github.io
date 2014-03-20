@@ -14,7 +14,19 @@
   <meta property="og:title" content="2048 game"/>
   <meta property="og:site_name" content="2048 game"/>
   <meta property="og:description" content="Join the numbers and get to the 2048 tile! Careful: this game is extremely addictive!"/>
-</head>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-49205690-1']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script></head>
 
 <body>
   <div class="container">
@@ -70,7 +82,7 @@
 
       </div>
     </div>
-    <p class="game-explanation"><strong class="important">Difference with the original version:</strong> there is no random tile! You only get "2" tiles, in the first available cell. <br /> A friend of mine reached the tile 8192 with score 113068, I have the replay somewhere to prove it. I'm sure you can do better!
+    <p class="game-explanation"><strong>Difference with the original version:</strong> there is no random tile! Each time you get a 2-tile in the first available cell. <br /><br />A friend of mine reached the tile 8192 with score 113068, I have the replay somewhere to prove it. I'm sure you can do better!
     </p>
     <p class="game-explanation">
       <strong class="important">How to play:</strong> Use your <strong>arrow keys</strong> to move the tiles. When two tiles with the same number touch, they <strong>merge into one!</strong>.
