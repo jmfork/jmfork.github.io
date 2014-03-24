@@ -16,7 +16,7 @@ a { color:#008; text-decoration:none;}
 a:hover { text-decoration:underline;}
 h2>a { color:#000; text-decoration:none;}
 div#content { text-align:left; }
-body {font-family:monospace,verdana,arial; margin-left:2em; text-align:center;}
+body {font-family:monospace,verdana,arial; margin-left:2em;  margin-right:2em; }
 #log { display:none; position:absolute; right:0; width:40%; }
 .done,     .done    >a {color:#070;}
 .doing,    .doing   >a {color:#005;}
@@ -27,14 +27,81 @@ input {font-family:monospace;}
 td {padding-right:10px;}
 th {padding-right:10px;}
 pre#errors{color:red;font-weight:bold;}
+pre.prettyprint {padding:10px;}
 </style>
+<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
 <title>~jmfork</title>
 </head>
 <body>
 <h2><a href=".">~jmfork</a></h2>
-<div style="width:49em">
-<p><strong><a href="./2048/">2048/</a></strong>
+<div>
+<p><strong><a href="./2048/">2048/</a></strong> is my deterministic
+version of Gabriele Cirulli's 2048 game derived from a game called
+1024, itself derived from Three.  Click on the link to see the full
+credentials.
 </p>
+<p>
+  I present here some details that can be used to publish on your
+  website a version that keep high scores, with the replay associated
+  with it.  Since it is deterministic and there is no random involved,
+  no cheating is possible: people can check the replay.
+</p>
+<p>
+  First, we need to convert most efficiently the moves in a string.
+  We could use compression algorithms implemented in javascript before
+  sending to the server, but it turns out for most games (and maybe
+  all of them) the compressed version takes even more space, so we
+  just try to encode the moves in the smaller amount of characters
+  possible.
+</p>
+<p>
+  There is four possible moves at each step, which amounts to two
+  bits.  We can fill up to eight bits a character, but that usually
+  yields encoding problems.  We can try only six bits, giving three
+  moves per characters, using one of
+  the <a href="http://en.wikipedia.org/wiki/Base64">base 64
+  schemes</a>.  Several signs should be avoided, the "+" is one of
+  them (because GET and POST requests encode spaces as plus signs, so
+  they are interpreted in this way) and the default scheme uses a "+".
+  We don't really consider that this encoding of moves should be a
+  standard, so we just take our own encoding:
+</p>
+<pre class="prettyprint"><code>var table64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-/";
+</code></pre> To convert a list of moves to a string, we iterate on
+the string. One good thing is we don't need to bother about padding,
+as a too long sequence will not be interpreted further:
+<pre class="prettyprint"><code>var string_of_moves = function(moves) {
+  while(moves.length%3)
+    moves.push(0);
+  n=moves.length;
+  r = "";
+  for(i = 0; i+2 &lt; n; i += 3) {
+    s = 0;
+    for(j = 0; j < 3; j++)
+      s = s*4 + moves[i+j]%4;
+    r += table64[s];
+  }
+  return r;
+}
+</code></pre> The code for unmarshaling back to a list of moves is
+very simple as well. Note that in javascript you don't have euclidean
+division by default, so you can use little tricks to recover it: when 
+<code class="prettyprint">x</code>
+is a floating-point number,
+<code class="prettyprint">x|0</code> returns the corresponding
+integer, the one with the smallest absolute value.  Of course, on
+integer numbers this operation, (bitwise or with 0 bits) is the
+identity function, so there is no problem here.  No further trikcs in
+the following code:
+<pre class="prettyprint"><code>var moves_of_string = function(s) {
+  v = [];
+  for(i = 0; i &lt; s.length; i++) {
+    k = table64.indexOf(s[i]);
+    v.push(k/16%4|0, k/4%4|0, k%4);
+  }
+  return v;
+}
+</code></pre>
 </div>
 </body>
 </html>
